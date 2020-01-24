@@ -1,0 +1,38 @@
+USE yeql_University_Mis
+CREATE TABLE yeql_Teacher(
+yql_Tno CHAR(5),
+yql_Tname CHAR(8) CONSTRAINT yql_U1 UNIQUE,
+yql_Tsex CHAR(1),
+yql_Tage INT CONSTRAINT yql_U2 CHECK (yql_Tage<=28),
+yql_Tdept CHAR(20),
+CONSTRAINT yql_PK_Teacher PRIMARY KEY(yql_Tno))
+
+USE yeql_University_Mis
+INSERT INTO yeql_Teacher (yql_Tno,yql_Tname,yql_Tsex,yql_Tage,yql_Tdept)
+VALUES('T01','李用','M',14,'后勤部')
+SELECT *
+FROM yeql_Teacher
+
+USE yeql_University_Mis
+INSERT INTO yeql_Teacher (yql_Tno,yql_Tname,yql_Tsex,yql_Tage,yql_Tdept)
+VALUES('T02','王勇','M',38,'后勤部')
+SELECT *
+FROM yeql_Teacher
+
+USE yeql_University_Mis
+ALTER TABLE yeql_Teacher 
+DROP yql_U2
+
+USE yeql_University_Mis
+Go
+CREATE RULE yql_Rule_sex 
+AS @Value IN ('F','M')
+Go
+/*sp_bindrule：将规则绑定到列或用户定义的数据类型。
+例：sp_bindrule rulType,’Titles.Type’   --将规则rulType绑定到Titles表的Type列*/
+EXEC SP_bindrule yql_Rule_sex,'yeql_Teacher.[yql_Tsex]'
+
+USE yeql_University_Mis
+INSERT INTO yeql_Teacher
+VALUES('T03','黄号','1','后勤部')
+

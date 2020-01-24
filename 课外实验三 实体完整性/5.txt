@@ -1,0 +1,70 @@
+﻿GRANT SELECT
+ON yeql_Courses
+TO PUBLIC
+
+USE yeql_University_Mis
+GRANT SELECT,INSERT,UPDATE
+ON yeql_Students
+TO USER1
+WITH GRANT OPTION
+GO
+
+INSERT 
+INTO yeql_Students
+VALUES('S30','叶倩琳','123456@qq.com','10','女')
+UPDATE yeql_Students
+SET yql_Scredit=20
+WHERE yql_Sno='S30'
+
+USE yeql_University_Mis
+GRANT SELECT(yql_Tno,yql_Cno,yql_Score),INSERT,UPDATE(yql_Score)
+ON yeql_Reports
+TO USER2
+GO
+
+INSERT 
+INTO yeql_Reports
+VALUES('S10','T10','C10',90)
+UPDATE yeql_Reports
+SET yql_Score=100
+WHERE yql_Tno='T01'
+SELECT yql_Tno,yql_Cno,yql_Score
+FROM yeql_Reports
+
+GRANT INSERT,UPDATE,SELECT
+ON yeql_Students
+TO USER2
+WITH GRANT OPTION
+
+INSERT 
+INTO yeql_Students
+VALUES('S05','张华','12345678@qq.com',18,'男')
+UPDATE yeql_Students
+SET yql_Scredit=20
+WHERE yql_Sno='S05'
+SELECT *
+FROM yeql_Students
+
+GRANT INSERT,UPDATE,SELECT
+ON yeql_Students
+TO USER3
+WITH GRANT OPTION
+
+REVOKE SELECT
+ON yeql_Courses
+FROM USER1
+
+SELECT *
+FROM yeql_Courses
+
+GRANT INSERT,UPDATE,SELECT
+ON yeql_Students
+TO USER1
+
+REVOKE INSERT,UPDATE,SELECT
+ON yeql_Students
+FROM USER3 CASCADE
+
+REVOKE INSERT,UPDATE,SELECT
+ON yeql_Students
+FROM USER1 CASCADE

@@ -1,0 +1,36 @@
+USE yeql_University_Mis
+CREATE TABLE yeql_Stu_Union(yql_Sno CHAR(8) NOT NULL UNIQUE,
+? ? ? ? ? ? ? ? ? ?yql_Sname CHAR(8),
+? ? ? ? ? ? ? ? ? ?yql_Ssex CHAR(1),
+? ? ? ? ? ? ? ? ? ?yql_Sage INT,
+? ? ? ? ? ? ? ? ? ?yql_Sdept CHAR(20),
+? ? ? ? ? ? ? ? ? ?CONSTRAINT yql_PK_Stu_Union PRIMARY KEY(yql_Sno));
+INSERT yeql_Stu_Union VALUES('S01','Íõ±ø','M',23,'CS');
+UPDATE yeql_Stu_Union SET yql_Sno=' ' WHERE yql_Sdept='CS';
+UPDATE yeql_Stu_Union SET yql_Sno='S02' WHERE yql_Sname='Íõ±ø';
+SELECT * FROM yeql_Stu_union;
+
+USE yeql_University_Mis
+SET XACT_ABORT ON
+BEGIN TRANSACTION T1
+INSERT INTO yeql_Stu_union VALUES('S09','ÀîÓÀ','M',25,'EE');
+INSERT INTO yeql_Stu_union VALUES ('S03','»ÆºÆ','F',25,'EE');
+INSERT INTO yeql_Stu_union VALUES ('S05','»ÆºÆ','F',25,'EE');
+SELECT * FROM yeql_Stu_union
+COMMIT TRANSACTION T1
+
+USE yeql_University_Mis
+SET ?XACT_ABORT ON
+BEGIN TRANSACTION ?T2
+INSERT INTO yeql_Stu_union VALUES ('S07','ÀîÄþ','M',25,'EE')
+SELECT * FROM yeql_Stu_union
+INSERT INTO yeql_Stu_union VALUES ('S09','Àî¾¸','F',22,'CS')
+COMMIT TRANSACTION T2
+
+USE yeql_University_Mis
+CREATE TABLE yeql_Scholarship(yql_M_ID VARCHAR(10), yql_Stu_id CHAR(8),yql_R_Money INT)
+INSERT INTO yeql_Scholarship VALUES('M01','S07',5000)
+INSERT INTO yeql_Scholarship VALUES ('M01','S08',8000)
+SELECT * FROM yeql_Scholarship
+
+

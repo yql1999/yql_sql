@@ -1,0 +1,3 @@
+REVOKE SELECT
+ON yeql_Courses
+FROM USER1

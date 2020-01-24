@@ -1,0 +1,53 @@
+CREATE VIEW yql_CS_View
+AS
+SELECT yql_Sno,yql_Tno,yql_Cno,yql_Score
+FROM yeql_Reports
+WHERE yql_Score>=60
+WITH CHECK OPTION
+
+CREATE VIEW yql_SCT_View
+AS
+SELECT yql_Sname,yql_Cname,yql_Tname
+FROM yeql_Reports,yeql_Students,yeql_Teachers,yeql_Courses
+WHERE yeql_Students.yql_Sno=yeql_Reports.yql_Sno AND
+yeql_Teachers.yql_Tno=yeql_Reports.yql_Tno AND
+yeql_Courses.yql_Cno=yeql_Reports.yql_Cno
+WITH CHECK OPTION
+
+CREATE VIEW yql_EXP_View
+AS
+SELECT yql_Sname,yql_Cname,yql_Score+5 'new yql_Score'
+FROM yeql_Reports,yeql_Students,yeql_Courses
+WHERE yeql_Students.yql_Sno=yeql_Reports.yql_Sno AND
+yeql_Courses.yql_Cno=yeql_Reports.yql_Cno
+WITH CHECK OPTION
+
+CREATE VIEW yql_GROUP_View
+AS
+SELECT yeql_Students.yql_Sno,AVG(yql_Score) AVERAGE
+FROM yeql_Reports,yeql_Students
+WHERE yeql_Students.yql_Sno=yeql_Reports.yql_Sno
+GROUP BY yeql_Students.yql_Sno
+
+CREATE VIEW yql_VV_View
+AS
+SELECT yql_Sno,COUNT(yql_Sno) COUNT,AVG(yql_Score) AVERAGE
+FROM yql_CS_View
+GROUP BY yql_Sno
+
+SELECT yql_Sname
+FROM yeql_Students,yeql_Courses,yeql_Reports
+WHERE yql_Cname='数据库原理及其应用' AND
+yeql_Courses.yql_Cno=yeql_Reports.yql_Cno AND
+yeql_Students.yql_Sno=yeql_Reports.yql_Sno
+
+INSERT
+INTO yql_CS_View
+VALUES('S52','T02','C02','59')
+
+UPDATE yql_CS_View
+SET yql_Score=yql_Score+5
+WHERE yql_Cno='C01'
+
+DROP VIEW yql_SCT_View
+DROP VIEW yql_CS_View

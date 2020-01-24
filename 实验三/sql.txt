@@ -1,0 +1,139 @@
+/*SQL语句说明段1:建立表Course，令Cno为其主键，并在Stu_Union中插入数据。*/
+USE yeql_University_Mis
+INSERT yeql_Stu_Union Values('S01','李用','0',24,'F')
+SELECT * FROM yeql_Stu_Union;
+CREATE TABLE yeql_Course(
+	yql_Cno CHAR(4) NOT NULL UNIQUE,
+	yql_Cname VARCHAR(50) NOT NULL,
+	yql_Cpoints INT,
+	CONSTRAINT PK PRIMARY KEY(yql_Cno));
+INSERT yeql_Course VALUES('C01','ComputerNetworks',2);
+INSERT yeql_Course VALUES('C02','ArtificialIntelligence',3);
+
+/*SQL语句说明段2：建立表SC，令Sno和Cno分别为参照Stu_Union表以及Course表的外键，设定为级联删除，
+并令(Sno,Cno)为其主键。在不违反参照完整性的前提下，插入数据。*/
+USE yeql_University_Mis
+CREATE Table yeql_SC(
+yql_Sno CHAR(8),
+yql_Cno CHAR(4),
+yeql_SCredit INT,
+CONSTRAINT PK_yeql_SC PRIMARY KEY(yql_Sno,yql_Cno),
+CONSTRAINT FK_yeql_SC_yql_Sno FOREIGN KEY(yql_Sno) REFERENCES yeql_Stu_Union (yql_Sno) ON DELETE CASCADE,
+CONSTRAINT FK_yeql_SC_yql_Cno FOREIGN KEY(yql_Cno) REFERENCES yeql_Course (yql_Cno) ON DELETE CASCADE,
+
+);
+INSERT INTO yeql_SC VALUES('S02','C01',2);
+INSERT INTO yeql_SC VALUES ('S02','C02',2);
+INSERT INTO yeql_SC VALUES ('S01','C01',2);
+INSERT INTO yeql_SC VALUES ('S01','C02',2);
+SELECT * FROM yeql_SC
+
+/*SQL语句说明段3：演示违反参照完整性的插入数据。
+*/
+USE yeql_University_Mis
+INSERT INTO yeql_SC VALUES('S99','C99',2);
+
+/*SQL语句说明段4：在Stu_Union中删除数据，演示级联删除。 
+*/
+USE yeql_University_Mis
+DELETE FROM yeql_Stu_Union WHERE yql_Sno='S01';
+SELECT * FROM yeql_SC;
+
+/*SQL语句说明段5：在Course中删除数据，演示级联删除。
+*/
+/*在yeql_Course中删除数据，演示级联删除*/
+USE yeql_University_Mis
+DELETE FROM yeql_Course WHERE yql_Cno='C02';
+SELECT * FROM yeql_SC;
+
+/*SQL语句说明段6：建立Stu_Card表，令yql_Sno参数为表的外键，
+令Card_id为其主键，并插入数据*/
+USE yeql_University_Mis
+CREATE TABLE yeql_Stu_Card(
+	yql_Card_id CHAR(14),
+	yql_Sno CHAR(8),
+	yql_Remained_money DECIMAL(10,2),
+	Constraint PK_yeql_Stu_Card PRIMARY KEY(yql_Card_id),
+   Constraint FK_yeql_Stu_Card_Sno FOREIGN KEY(yql_Sno) 
+   REFERENCES yeql_Students(yql_Sno) ON DELETE CASCADE
+)
+INSERT INTO yeql_Stu_Card VALUES('05212567','S03',400.25);
+INSERT INTO yeql_Stu_Card VALUES('05212222','S09',600.50);
+SELECT * FROM yeql_Stu_Card;
+
+/*SQL语句说明段7：建立ICBC_Card表，令yql_Stu_card_id为外键，
+令yql_Bank_id为其主键，并插入数据
+*/
+USE yeql_University_Mis
+CREATE TABLE yeql_ICBC_Card(
+	yql_Bank_id CHAR(20),
+	yql_Stu_card_id CHAR(14),
+	yql_Restored_money DECIMAL(10,2),
+	constraint PK_yeql_ICBC_Card PRIMARY KEY(yql_Bank_id),
+   constraint FK_yeql_ICBC_Card_Stu_id FOREIGN KEY(yql_Stu_card_id) 
+   REFERENCES yeql_Stu_card(yql_card_id) ON DELETE CASCADE
+)
+INSERT INTO yeql_ICBC_Card VALUES('9558844022312','05212567',15000.1);
+INSERT INTO yeql_ICBC_Card VALUES('9558844023645','05212222',50000.3);
+SELECT * FROM yeql_ICBC_Card
+
+/*SQL语句说明段8：通过删除Students表中的一条记录，演示三个表的多重级联删除。
+*/
+USE yeql_University_Mis
+ALTER TABLE yeql_Reports DROP [yql_Sno];
+ALTER TABLE yeql_Reports ADD
+CONSTRAINT [FK_yeql_Reports_Students] FOREIGN KEY
+	(
+		[yql_Sno]
+	) REFERENCES [dbo].[yeql_Students] (
+		[yql_Sno]
+	) ON DELETE CASCADE;     
+DELETE FROM yeql_Students WHERE yql_Sno='S03';
+SELECT * FROM yeql_Stu_card;
+SELECT * FROM yeql_ICBC_Card;
+
+/*SQL语句说明段9：修改ICBC_Card表的外键属性，使其变为On delete No action，
+演示事务中通过删除Students表中的一条记录，多重级联删除失败，整个事务回滚到事务的初始状态。
+*/
+ALTER TABLE yeql_ICBC_Card
+DROP CONSTRAINT FK_yeql_ICBC_Card_Stu_id;
+ALTER TABLE yeql_ICBC_Card
+ADD CONSTRAINT FK_yeql_ICBC_Card_Stu_id FOREIGN KEY (yql_Stu_card_id)
+	REFERENCES yeql_Stu_card(yql_Card_id) ON DELETE NO ACTION;
+
+Begin Transaction Del
+DELETE FROM yeql_Stu_Card WHERE yql_Card_id ='05212222';
+SELECT * FROM yeql_Stu_card;
+SELECT * FROM yeql_ICBC_card;
+Commit Transaction Del
+
+USE yeql_University_Mis
+SELECT * FROM yeql_Stu_card;
+SELECT * FROM yeql_ICBC_card;
+
+/*SQL语句说明段10：要建立教师授课和课程指定教师听课关系的两张表，规定一个教师可以授多门课，
+但是每个课程只能指定一个教师去听课，所以要为两张表建立相互之间的参照关系
+*/
+USE yeql_University_Mis
+CREATE TABLE yeql_Listen_course(
+	yql_Tno CHAR(6),yql_Tname VARCHAR(20),yql_Cno CHAR(4)
+	CONSTRAINT PK_yeql_listen_course PRIMARY KEY(yql_Tno)
+	CONSTRAINT FK_yeql_listen_course FOREIGN KEY(yql_Cno)
+	REFERENCES yeql_Teach_course(yql_Cno)
+)
+CREATE TABLE yeql_Teach_course(
+	yql_Cno CHAR(4),yql_Cname VARCHAR(30),yql_Tno CHAR(6)
+	CONSTRAINT PK_yeql_Teach_course PRIMARY KEY(yql_Cno)
+	CONSTRAINT FK_yeql_Teach_course FOREIGN KEY(yql_Tno)
+	REFERENCES yeql_Listen_course(yql_Tno)
+)
+
+
+USE yeql_University_Mis
+CREATE TABLE yeql_Listen_course(
+	yql_Tno CHAR(6),yql_Tname VARCHAR(20),yql_Cno CHAR(4)
+	CONSTRAINT PK_yeql_listen_course PRIMARY KEY(yql_Tno)
+)
+
+
+

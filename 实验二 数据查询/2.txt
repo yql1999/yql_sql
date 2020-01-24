@@ -1,0 +1,205 @@
+INSERT
+INTO yeql_Students
+VALUES('S01','王建平','WJP@zjut.edu.cn',23.1,'男'),
+('S02','刘华','LH@zjut.edu.cn',34.6,'女'),
+('S03','范林军','FLJ@zjut.edu.cn',16.6,'女'),
+('S04','李伟','LW@zjut.edu.cn',15.8,'男'),
+('S26','黄河','Huanghe@zjut.edu.cn',13.4,'男'),
+('S52','长江','Changjiang@zjut.edu.cn',12.4,'男')
+
+INSERT
+INTO yeql_Teachers
+VALUES('T01','刘涛','LT@zjut.edu.cn',4300),
+('T02','吴碧燕','WBY@zjut.edu.cn',2500),
+('T03','张莹','ZY@zjut.edu.cn',3000),
+('T04','张宁亚','ZNY@zjut.edu.cn',5500),
+('T05','叶烨','Yeye@zjut.edu.cn',3800),
+('T06','杨兰','YL@zjut.edu.cn',3500),
+('T07','程媛媛','ChengYY@zjut.edu.cn',5000)
+
+INSERT
+INTO yeql_Courses
+VALUES('C01','C++',4),
+('C02','UML',3),
+('C03','JAVA',3),
+('C04','算法分析与设计',2),
+('C05','数据库原理及其应用',2),
+('C06','数据结构与算法分析',2),
+('C07','英语',4)
+
+INSERT
+INTO yeql_Reports
+VALUES('S01','T01','C01',83),
+('S01','T03','C03',83),
+('S02','T01','C01',75),
+('S02','T02','C02',59),
+('S02','T03','C03',null),
+('S02','T04','C04',null),
+('S02','T05','C05',77),
+('S02','T06','C06',86),
+('S02','T07','C07',80),
+('S03','T02','C02',88),
+('S03','T04','C04',76),
+('S04','T05','C05',90),
+('S04','T06','C06',89),
+('S26','T04','C04',72),
+('S26','T05','C05',95),
+('S26','T07','C07',55),
+('S52','T01','C01',61),
+('S52','T05','C05',90),
+('S52','T07','C07',null)
+
+SELECT yql_Sname
+FROM yeql_Students
+WHERE yql_Ssex='男'
+ORDER BY yql_Sno
+
+/*查询学生的选课成绩合格的课程成绩，并把成绩换算为积分。积分的计算公式为：
+[1+(考试成绩-60)*0.1]*Ccredit。考试成绩>=60 否则=0*/
+SELECT yeql_Students.yql_Sname,yql_Score,(1+(yql_Score-60)*0.1)*yql_Ccredit yql_credit
+FROM yeql_Students,yeql_Courses,yeql_Reports
+WHERE yeql_Students.yql_Sno=yeql_Reports.yql_Sno AND
+yeql_Courses.yql_Cno=yeql_Reports.yql_Cno AND yql_Score>=60
+
+SELECT yql_Cname
+FROM yeql_Courses
+WHERE yql_Ccredit=3 OR yql_Ccredit=4
+
+SELECT yql_Cno
+FROM yeql_Courses
+WHERE yql_Cname LIKE'%算法%'
+
+SELECT DISTINCT yql_Cno
+FROM yeql_Courses
+ORDER BY yql_Cno ASC
+
+SELECT AVG(yql_Tsalary) yql_avgTsalary
+FROM yeql_Teachers
+
+SELECT yql_Tno,AVG(yql_Score) yql_avgScore
+FROM yeql_Reports
+GROUP BY yql_Tno
+ORDER BY yql_avgScore DESC
+
+SELECT yql_Cno,COUNT(yql_Sno) yql_countSno,AVG(yql_Score) yql_avgScore
+FROM yeql_Reports
+GROUP BY yql_Cno
+
+SELECT yeql_Students.yql_Sno,yql_Sname
+FROM yeql_Students,yeql_Reports
+WHERE yeql_Students.yql_Sno=yeql_Reports.yql_Sno
+GROUP BY yeql_Students.yql_Sno
+HAVING COUNT(yql_Cno)>=3
+
+
+12）
+SELECT yql_Cno,yql_Cname,yeql_Students.*
+FROM yeql_Courses,yeql_Students
+WHERE yql_Sno IN
+(SELECT yql_Sno
+FROM yeql_Reports
+WHERE yql_Cno IN
+(SELECT yql_Cno
+FROM yeql_Courses))
+ORDER BY yql_Cno ASC
+
+19）
+SELECT yql_Cno,yql_Cname
+FROM yeql_Courses
+WHERE yql_Cno IN
+(SELECT yql_Cno
+FROM yeql_Reports
+GROUP BY yql_Cno
+HAVING COUNT(yql_Sno)=0)
+
+SELECT yql_Sno,yql_Sname
+FROM yeql_Students
+WHERE yql_Sno IN
+(SELECT yql_Sno
+FROM yeql_Reports
+WHERE yql_Cno IN
+(SELECT yql_Cno
+FROM yeql_Courses
+WHERE yql_Cname='C++'))
+
+SELECT yql_Sno,yql_Sname
+FROM yeql_Students
+WHERE yql_Sno IN
+(SELECT yql_Sno
+FROM yeql_Reports
+WHERE yql_Cno IN
+(SELECT yql_Cno
+FROM yeql_Courses
+WHERE yql_Cname='C++' OR yql_Cname='UML'))
+
+SELECT A.yql_Cname
+FROM yeql_Courses A
+WHERE A.yql_Cno IN
+(SELECT A.yql_Cno
+FROM yeql_Courses B,yeql_Courses C
+WHERE B.yql_Cname='UML' AND C.yql_Cname='C++' AND 
+(A.yql_Ccredit=B.yql_Ccredit OR A.yql_Ccredit=C.yql_Ccredit))
+
+SELECT yql_Sname
+FROM yeql_Students,yeql_Reports
+WHERE yql_Cno='C01' AND yeql_Reports.yql_Sno=yeql_Stdents.yql_Sno
+
+SELECT yql_Sname
+FROM yeql_Students
+WHERE yql_Sno IN
+(SELECT yql_Sno
+FROM yeql_Reports
+GROUP BY yql_Sno
+HAVING COUNT(yql_Cno)=
+(SELECT COUNT(DISTINCT yql_Cno)
+FROM yeql_Courses))
+
+SELECT yql_Sno,yql_Sname,yql_Scredit
+FROM yeql_Students
+WHERE yql_Sno IN
+(SELECT yql_Sno
+FROM yeql_Reports
+WHERE yql_Cno IN
+(SELECT yql_Cno
+FROM yeql_Courses
+WHERE yql_Cname='C++' OR yql_Cname='JAVA'))
+
+SELECT yql_Sno,yql_Sname,yql_Scredit
+FROM yeql_Students
+WHERE yql_Sno IN
+(SELECT yql_Sno
+FROM yeql_Reports
+WHERE yql_Cno IN
+(SELECT yql_Cno
+FROM yeql_Courses
+WHERE yql_Cname='C++'))
+INTERSECT
+SELECT yql_Sno,yql_Sname,yql_Scredit
+FROM yeql_Students
+WHERE yql_Sno IN
+(SELECT yql_Sno
+FROM yeql_Reports
+WHERE yql_Cno IN
+(SELECT yql_Cno
+FROM yeql_Courses
+WHERE yql_Cname='JAVA'))
+
+SELECT yql_Sno
+FROM yeql_Students
+WHERE yql_Sno IN
+(SELECT yql_Sno
+FROM yeql_Reports
+WHERE yql_Cno IN
+(SELECT yql_Cno
+FROM yeql_Courses
+WHERE yql_Cname='C++'))
+INTERSECT
+SELECT yql_Sno
+FROM yeql_Students
+WHERE yql_Sno NOT IN
+(SELECT yql_Sno
+FROM yeql_Reports
+WHERE yql_Cno IN
+(SELECT yql_Cno
+FROM yeql_Courses
+WHERE yql_Cname='JAVA'))

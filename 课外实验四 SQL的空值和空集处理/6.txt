@@ -1,0 +1,61 @@
+SELECT yql_Score,yql_Score/20 成绩五分制
+FROM yeql_Reports
+
+SELECT COUNT(*) 选修编号C07的课程的学生的人数
+FROM yeql_Reports
+WHERE yql_Cno='C07'
+
+SELECT COUNT(*) 选修编号C07的课程的成绩合格的学生的人数
+FROM yeql_Reports
+WHERE yql_Cno='C07' AND yql_Score>=60
+
+SELECT COUNT(*) 选修编号C07的课程的成绩为空的学生的人数
+FROM yeql_Reports
+WHERE yql_Cno='C07' AND yql_Score IS NULL
+
+SELECT DISTINCT yql_Score
+FROM yeql_Reports
+ORDER BY yql_Score DESC
+
+SELECT yql_Score
+FROM yeql_Reports
+GROUP BY yql_Score
+
+SELECT yql_Sno,AVG(yql_Score) yql_avg_score,COUNT(*) 总的选课记录,
+MAX(yql_Score) max_yql_score,MIN(yql_Score) min_yql_score
+FROM yeql_Reports
+GROUP BY yql_Sno
+
+SELECT AVG(yql_Score) yql_avg_score,COUNT(*) 总的选课记录,SUM(yql_Score) 
+yql_sum_score,MAX(yql_Score) max_yql_score,MIN(yql_Score) min_yql_score
+FROM yeql_Reports
+WHERE yql_Score<0
+GROUP BY yql_Sno
+
+SELECT yql_Ccredit
+FROM yeql_Courses
+WHERE yql_Ccredit<ALL(SELECT yql_Ccredit 
+FROM yeql_Courses)
+
+
+CREATE TABLE yeql_S(yql_No CHAR(5) PRIMARY KEY,
+yql_Sno CHAR(5),
+yql_Sname CHAR(5))
+
+CREATE TABLE yeql_T(yql_No CHAR(5) PRIMARY KEY,
+yql_Tno CHAR(5),
+yql_Tname CHAR(5))
+
+INSERT
+INTO yeql_S
+VALUES('n1','S01','李迪'),('n2','S02','李岚'),
+('n3','S05','NULL'),('n4','S04','关红')
+
+INSERT
+INTO yeql_T
+VALUES('n1','T09','李迪'),('n2','T08','李兰'),
+('n3','T01','NULL'),('n4','T02','NULL')
+
+SELECT DISTINCT yql_Sno,yql_Tno
+FROM yeql_S,yeql_T
+WHERE yql_Sname=yql_Tname
